@@ -279,18 +279,17 @@ This is used when creating a dataset automatically, the user can then through al
 The difficult field is set to 1 indicates that the object has been annotated as "difficult", for example, an object which is clearly visible but difficult to recognize without substantial use of context.
 According to your deep neural network implementation, you can include or exclude difficult objects during training.
 
-How to contribute
-~~~~~~~~~~~~~~~~~
-
-Send a pull request
 
 Thank you @tzutalin & License
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This annotation tool was originally build by tzutalin. This is just an extension of his work.
+
 `Free software: MIT license <https://github.com/tzutalin/labelImg/blob/master/LICENSE>`_
 
 Citation: Tzutalin. LabelImg. Git code (2015). https://github.com/tzutalin/labelImg
 
+
 .. image:: https://forthebadge.com/images/badges/built-with-love.svg
         :target: https://github.com/SanjyotZade/labelImg-TRK
 
-Author:`SanjyotZade <http://www.sanjyot.info/>`__
+Author: `SanjyotZade <http://www.sanjyot.info/>`__
