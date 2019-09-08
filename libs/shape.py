@@ -38,13 +38,14 @@ class Shape(object):
     point_size = 8
     scale = 1.0
 
-    def __init__(self, label=None, line_color=None, difficult=False, paintLabel=False):
+    def __init__(self, label=None, line_color=None, difficult=False, paintLabel=False, default_fill_color=DEFAULT_SELECT_FILL_COLOR):
         self.label = label
         self.points = []
         self.fill = False
         self.selected = False
         self.difficult = difficult
         self.paintLabel = paintLabel
+        self.select_fill_color = default_fill_color
 
         self._highlightIndex = None
         self._highlightMode = self.NEAR_VERTEX

@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import cv2
+import sys
 import codecs
-import distutils.spawn
 import os.path
 import platform
-import re
-import sys
 import subprocess
-
 from functools import partial
 from collections import defaultdict
+
+trackerTypes = ['BOOSTING', 'MIL', 'KCF', 'TLD', 'MEDIANFLOW', 'GOTURN', 'MOSSE', 'CSRT']
 
 try:
     from PyQt5.QtGui import *
@@ -118,11 +118,34 @@ class MainWindow(QMainWindow, WindowMixin):
         self.useDefaultLabelCheckbox = QCheckBox(getStr('useDefaultLabel'))
         self.useDefaultLabelCheckbox.setChecked(False)
         self.defaultLabelTextLine = QLineEdit()
+
         useDefaultLabelQHBoxLayout = QHBoxLayout()
         useDefaultLabelQHBoxLayout.addWidget(self.useDefaultLabelCheckbox)
         useDefaultLabelQHBoxLayout.addWidget(self.defaultLabelTextLine)
         useDefaultLabelContainer = QWidget()
         useDefaultLabelContainer.setLayout(useDefaultLabelQHBoxLayout)
+
+        #create a widget for tracking information
+        self.trackingComboBox = QComboBox()
+        self.trackingComboBox.addItem("BOOSTING")
+        self.trackingComboBox.addItem("MIL")
+        self.trackingComboBox.addItem("KCF")
+        self.trackingComboBox.addItem("TLD")
+        self.trackingComboBox.addItem("MEDIANFLOW")
+        # self.trackingComboBox.addItem("GOTURN")
+        self.trackingComboBox.addItem("MOSSE")
+        self.trackingComboBox.addItem("CSRT")
+        self.trackingComboBoxQlabel = QLabel("Tracking algo")
+
+        self.trackingCheckbox = QCheckBox("Tracking")
+        self.trackingCheckbox.setChecked(True)
+
+        trackingQHBoxLayout = QHBoxLayout()
+        trackingQHBoxLayout.addWidget(self.trackingCheckbox)
+        trackingQHBoxLayout.addWidget(self.trackingComboBoxQlabel, alignment=Qt.AlignRight)
+        trackingQHBoxLayout.addWidget(self.trackingComboBox)
+        trackingLabelContainer = QWidget()
+        trackingLabelContainer.setLayout(trackingQHBoxLayout)
 
         # Create a widget for edit and diffc button
         self.diffcButton = QCheckBox(getStr('useDifficult'))
@@ -131,10 +154,12 @@ class MainWindow(QMainWindow, WindowMixin):
         self.editButton = QToolButton()
         self.editButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
+
         # Add some of widgets to listLayout
         listLayout.addWidget(self.editButton)
         listLayout.addWidget(self.diffcButton)
         listLayout.addWidget(useDefaultLabelContainer)
+        listLayout.addWidget(trackingLabelContainer)
 
         # Create and add a widget for showing current label items
         self.labelList = QListWidget()
@@ -191,6 +216,8 @@ class MainWindow(QMainWindow, WindowMixin):
 
         self.dockFeatures = QDockWidget.DockWidgetClosable | QDockWidget.DockWidgetFloatable
         self.dock.setFeatures(self.dock.features() ^ self.dockFeatures)
+
+
 
         # Actions
         action = partial(newAction, self)
@@ -743,10 +770,16 @@ class MainWindow(QMainWindow, WindowMixin):
         del self.shapesToItems[shape]
         del self.itemsToShapes[item]
 
-    def loadLabels(self, shapes):
+    def loadLabels(self, shapes, draw=True, track_color=False):
         s = []
         for label, points, line_color, fill_color, difficult in shapes:
-            shape = Shape(label=label)
+
+            if track_color:
+                # highlight tracked box in different color
+                shape = Shape(label=label, default_fill_color=QColor(128, 0, 0, 75))
+            else:
+                shape = Shape(label=label)
+
             for x, y in points:
 
                 # Ensure the labels are within the bounds of the image. If not, fix them.
@@ -759,19 +792,21 @@ class MainWindow(QMainWindow, WindowMixin):
             shape.close()
             s.append(shape)
 
-            if line_color:
-                shape.line_color = QColor(*line_color)
-            else:
-                shape.line_color = generateColorByText(label)
+            if draw:
+                if line_color:
+                    shape.line_color = QColor(*line_color)
+                else:
+                    shape.line_color = generateColorByText(label)
 
-            if fill_color:
-                shape.fill_color = QColor(*fill_color)
-            else:
-                shape.fill_color = generateColorByText(label)
+                if fill_color:
+                    shape.fill_color = QColor(*fill_color)
+                else:
+                    shape.fill_color = generateColorByText(label)
 
-            self.addLabel(shape)
+                self.addLabel(shape)
 
         self.canvas.loadShapes(s)
+        return s
 
     def saveLabels(self, annotationFilePath):
         annotationFilePath = ustr(annotationFilePath)
@@ -803,7 +838,7 @@ class MainWindow(QMainWindow, WindowMixin):
             else:
                 self.labelFile.save(annotationFilePath, shapes, self.filePath, self.imageData,
                                     self.lineColor.getRgb(), self.fillColor.getRgb())
-            print('Image:{0} -> Annotation:{1}'.format(self.filePath, annotationFilePath))
+            print('Image:{0} -> Annotation:{1}\n'.format(self.filePath, annotationFilePath))
             return True
         except LabelFileError as e:
             self.errorMessage(u'Error saving label data', u'<b>%s</b>' % e)
@@ -836,7 +871,6 @@ class MainWindow(QMainWindow, WindowMixin):
     # Callback functions:
     def newShape(self):
         """Pop-up and give focus to the label editor.
-
         position MUST be in global coordinates.
         """
         if not self.useDefaultLabelCheckbox.isChecked() or not self.defaultLabelTextLine.text():
@@ -955,7 +989,147 @@ class MainWindow(QMainWindow, WindowMixin):
         for item, shape in self.itemsToShapes.items():
             item.setCheckState(Qt.Checked if value else Qt.Unchecked)
 
-    def loadFile(self, filePath=None):
+    def createTrackerByName(self):
+        trackerType = self.trackingComboBox.currentText()
+
+        # Create a tracker based on tracker name
+        if trackerType == trackerTypes[0]:
+            tracker = cv2.TrackerBoosting_create()
+        elif trackerType == trackerTypes[1]:
+            tracker = cv2.TrackerMIL_create()
+        elif trackerType == trackerTypes[2]:
+            tracker = cv2.TrackerKCF_create()
+        elif trackerType == trackerTypes[3]:
+            tracker = cv2.TrackerTLD_create()
+        elif trackerType == trackerTypes[4]:
+            tracker = cv2.TrackerMedianFlow_create()
+        elif trackerType == trackerTypes[5]:
+            tracker = cv2.TrackerGOTURN_create()
+        elif trackerType == trackerTypes[6]:
+            tracker = cv2.TrackerMOSSE_create()
+        elif trackerType == trackerTypes[7]:
+            tracker = cv2.TrackerCSRT_create()
+        return tracker
+
+    def tracking(self, new_file_path, old_file_path, old_shapes, format=FORMAT_PASCALVOC):
+        old_image = cv2.imread(old_file_path)
+        new_image = cv2.imread(new_file_path)
+
+        if old_image.shape == new_image.shape:
+            for value_num, old_shape in enumerate(old_shapes):
+                points = old_shape[1]
+
+                w = int(points[2][0]) - int(points[0][0])
+                h = int(points[2][1]) - int(points[0][1])
+                bbox = (int(points[0][0]), int(points[0][1]), w, h)
+
+                multiTracker = cv2.MultiTracker_create()
+                multiTracker.add(self.createTrackerByName(), old_image, bbox)
+                success, boxes = multiTracker.update(new_image)
+
+                x1, y1, w, h = boxes[0]
+
+                point1=(int(x1), int(y1))
+                point2 = (int(x1), int(y1) + int(h))
+                point3 = (int(w) + int(x1), int(y1))
+
+
+                point4 = (
+                    int(x1) + int(w),
+                    int(y1) + int(h)
+                )
+
+                old_shapes[value_num] = list(old_shapes[value_num])
+                old_shapes[value_num][1] = [point1, point2, point4, point3]
+                old_shapes[value_num] = tuple(old_shapes[value_num])
+
+                # bebugging
+                # cv2.circle(new_image, point1, 3, (0, 0, 255), -1)
+                # cv2.circle(new_image, point4, 3,(0, 0, 255), -1)
+                # cv2.circle(new_image, point2, 3,(0, 255, 255), -1)
+                # cv2.circle(new_image, point3, 3,(0, 0, 255), -1)
+                # cv2.imshow("new", new_image)
+
+            self.labelFile = LabelFile()
+
+            if old_shapes:
+                self.set_format(format)
+                self.loadLabels(old_shapes, draw=False)
+                self.saveFile()
+            return old_shapes
+        else:
+            return None
+
+    def loadAnnotations(self, xmlPath, txtPath, old_file_path):
+
+        if old_file_path:
+            if not self.defaultSaveDir:
+                old_xmlPath = os.path.splitext(old_file_path)[0] + XML_EXT
+                old_txtPath = os.path.splitext(old_file_path)[0] + TXT_EXT
+            else:
+                basename = os.path.basename(os.path.splitext(old_file_path)[0])
+                old_xmlPath = os.path.join(self.defaultSaveDir, basename + XML_EXT)
+                old_txtPath = os.path.join(self.defaultSaveDir, basename + TXT_EXT)
+        else:
+            old_xmlPath = ""
+            old_txtPath = ""
+
+        tracked = False
+
+        # # select the tracking algo
+        # self.trackerAlgo = self.createTrackerByName()
+
+        """Annotation file priority:
+        PascalXML > YOLO
+        """
+        # if xml present
+        if os.path.isfile(xmlPath):
+            current_shape = self.loadPascalXMLByFilename(xmlPath)
+            if os.path.isfile(old_xmlPath):
+                tVocParseReader = PascalVocReader(old_xmlPath)
+                old_shapes = tVocParseReader.getShapes()
+                # xml present but empty
+                if not current_shape:
+                    if self.trackingCheckbox.isChecked():
+                        new_shapes = self.tracking(self.filePath, old_file_path, old_shapes, format=FORMAT_PASCALVOC)
+                        tracked = True
+                        if new_shapes:
+                            self.loadPascalXMLByFilename(xmlPath, track_color=True)
+        # if txt present
+        elif os.path.isfile(txtPath):
+            current_shape = self.loadYOLOTXTByFilename(txtPath)
+            if os.path.isfile(old_txtPath):
+                tYoloParseReader = YoloReader(old_txtPath, QImage.fromData(read(ustr(old_file_path), None)))
+                old_shapes = tYoloParseReader.getShapes()
+                # txt present but empty
+                if not current_shape:
+                    if self.trackingCheckbox.isChecked():
+                        new_shapes = self.tracking(self.filePath, old_file_path, old_shapes, format=FORMAT_YOLO)
+                        tracked = True
+                        if new_shapes:
+                            self.loadYOLOTXTByFilename(txtPath, track_color=True)
+        # if neither present
+        elif os.path.isfile(old_xmlPath):
+            # tracking in PASCAL VOC format
+            tVocParseReader = PascalVocReader(old_xmlPath)
+            old_shapes = tVocParseReader.getShapes()
+            if self.trackingCheckbox.isChecked():
+                new_shapes = self.tracking(self.filePath, old_file_path, old_shapes, format=FORMAT_PASCALVOC)
+                tracked = True
+                if new_shapes:
+                    self.loadPascalXMLByFilename(xmlPath, track_color=True)
+        elif os.path.isfile(old_txtPath):
+            # tracking in YOLO format
+            tYoloParseReader = YoloReader(old_txtPath, QImage.fromData(read(ustr(old_file_path), None)))
+            old_shapes = tYoloParseReader.getShapes()
+            if self.trackingCheckbox.isChecked():
+                new_shapes = self.tracking(self.filePath, old_file_path, old_shapes, format=FORMAT_YOLO)
+                tracked = True
+                if new_shapes:
+                    self.loadYOLOTXTByFilename(txtPath, track_color=True)
+        return tracked
+
+    def loadFile(self, filePath=None, old_file_path=None):
         """Load the specified file, or the last opened file if None."""
         self.resetState()
         self.canvas.setEnabled(False)
@@ -1023,27 +1197,21 @@ class MainWindow(QMainWindow, WindowMixin):
             # Label xml file and show bound box according to its filename
             # if self.usingPascalVocFormat is True:
             if self.defaultSaveDir is not None:
-                basename = os.path.basename(
-                    os.path.splitext(self.filePath)[0])
+                basename = os.path.basename(os.path.splitext(self.filePath)[0])
                 xmlPath = os.path.join(self.defaultSaveDir, basename + XML_EXT)
                 txtPath = os.path.join(self.defaultSaveDir, basename + TXT_EXT)
 
-                """Annotation file priority:
-                PascalXML > YOLO
-                """
-                if os.path.isfile(xmlPath):
-                    self.loadPascalXMLByFilename(xmlPath)
-                elif os.path.isfile(txtPath):
-                    self.loadYOLOTXTByFilename(txtPath)
+                tracked = self.loadAnnotations(xmlPath, txtPath, old_file_path)
+
             else:
                 xmlPath = os.path.splitext(filePath)[0] + XML_EXT
                 txtPath = os.path.splitext(filePath)[0] + TXT_EXT
-                if os.path.isfile(xmlPath):
-                    self.loadPascalXMLByFilename(xmlPath)
-                elif os.path.isfile(txtPath):
-                    self.loadYOLOTXTByFilename(txtPath)
+                tracked = self.loadAnnotations(xmlPath, txtPath, old_file_path)
 
-            self.setWindowTitle(__appname__ + ' ' + filePath)
+            if tracked and old_file_path:
+                self.setWindowTitle(self.trackingComboBox.currentText()+' tracking ' + old_file_path.split("/")[-1]+" >> "+filePath.split("/")[-1])
+            else:
+                self.setWindowTitle('Label: ' + ' ' + filePath.split("/")[-1])
 
             # Default : select last item if there is at least one item
             if self.labelList.count():
@@ -1261,13 +1429,14 @@ class MainWindow(QMainWindow, WindowMixin):
         filename = None
         if self.filePath is None:
             filename = self.mImgList[0]
+            old_filepath = None
         else:
             currIndex = self.mImgList.index(self.filePath)
             if currIndex + 1 < len(self.mImgList):
                 filename = self.mImgList[currIndex + 1]
-
+                old_filepath = self.mImgList[currIndex]
         if filename:
-            self.loadFile(filename)
+            self.loadFile(filename, old_file_path=old_filepath)
 
     def openFile(self, _value=False):
         if not self.mayContinue():
@@ -1293,8 +1462,7 @@ class MainWindow(QMainWindow, WindowMixin):
             imgFileName = os.path.basename(self.filePath)
             savedFileName = os.path.splitext(imgFileName)[0]
             savedPath = os.path.join(imgFileDir, savedFileName)
-            self._saveFile(savedPath if self.labelFile
-                           else self.saveFileDialog(removeExt=False))
+            self._saveFile(savedPath if self.labelFile else self.saveFileDialog(removeExt=False))
 
     def saveFileAs(self, _value=False):
         assert not self.image.isNull(), "cannot save empty image"
@@ -1406,7 +1574,7 @@ class MainWindow(QMainWindow, WindowMixin):
                     else:
                         self.labelHist.append(line)
 
-    def loadPascalXMLByFilename(self, xmlPath):
+    def loadPascalXMLByFilename(self, xmlPath, track_color=False):
         if self.filePath is None:
             return
         if os.path.isfile(xmlPath) is False:
@@ -1416,10 +1584,11 @@ class MainWindow(QMainWindow, WindowMixin):
 
         tVocParseReader = PascalVocReader(xmlPath)
         shapes = tVocParseReader.getShapes()
-        self.loadLabels(shapes)
+        self.loadLabels(shapes, track_color=track_color)
         self.canvas.verified = tVocParseReader.verified
+        return shapes
 
-    def loadYOLOTXTByFilename(self, txtPath):
+    def loadYOLOTXTByFilename(self, txtPath, track_color=False):
         if self.filePath is None:
             return
         if os.path.isfile(txtPath) is False:
@@ -1428,9 +1597,9 @@ class MainWindow(QMainWindow, WindowMixin):
         self.set_format(FORMAT_YOLO)
         tYoloParseReader = YoloReader(txtPath, self.image)
         shapes = tYoloParseReader.getShapes()
-        print (shapes)
-        self.loadLabels(shapes)
+        self.loadLabels(shapes, track_color=track_color)
         self.canvas.verified = tYoloParseReader.verified
+        return shapes
 
     def togglePaintLabelsOption(self):
         for shape in self.canvas.shapes:
@@ -1474,6 +1643,7 @@ def main():
     '''construct main app and run it'''
     app, _win = get_main_app(sys.argv)
     return app.exec_()
+
 
 if __name__ == '__main__':
     sys.exit(main())
