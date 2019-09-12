@@ -5,7 +5,7 @@ LabelImg-TRK is a graphical image annotation tool.
 
 It is written in Python and uses Qt for its graphical interface.
 
-:ref: `Tracking <http://www.image-net.org/>`__ has been recently added to LabelImg-TRK to fasten the data annotation process. Consecutive images should have same dimensions.
+Tracking has been recently added to LabelImg-TRK to fasten the data annotation process. Consecutive images should have same dimensions.
 
 Annotations are saved as XML files in PASCAL VOC format, the format used
 by `ImageNet <http://www.image-net.org/>`__.  Besides, it also supports YOLO format
@@ -273,15 +273,3 @@ Citation: Tzutalin. LabelImg. Git code (2015). https://github.com/tzutalin/label
         :target: https://github.com/SanjyotZade/labelImg-TRK
 
 Author: `SanjyotZade <http://www.sanjyot.info/>`__
-
-
-.. _header-1-label-name:
-
-Header 1
-========
-
-Some text
-
-Here is a section reference: :ref:`header-1-label-name`.
-
-Here is a section reference with a title: :ref:`Header 1 with a title <header-1-label-name>`.
