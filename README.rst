@@ -5,7 +5,7 @@ LabelImg-TRK is a graphical image annotation tool.
 
 It is written in Python and uses Qt for its graphical interface.
 
-Tracking has been recently added to LabelImg-TRK to fasten the data annotation process.
+:ref:`Tracking<header-obj-trac>`__ has been recently added to LabelImg-TRK to fasten the data annotation process. Consecutive images should have same dimensions.
 
 Annotations are saved as XML files in PASCAL VOC format, the format used
 by `ImageNet <http://www.image-net.org/>`__.  Besides, it also supports YOLO format
@@ -39,6 +39,7 @@ Python 2 + Qt4
 
     sudo apt-get install pyqt4-dev-tools
     sudo pip install lxml
+    sudo pip install opencv-python opencv-contrib-python
     make qt4py2
     python labelImg.py
     python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
@@ -62,6 +63,7 @@ Python 2 + Qt4
     brew install qt qt4
     brew install libxml2
     make qt4py2
+    pip install opencv-python opencv-contrib-python
     python labelImg.py
     python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
@@ -77,6 +79,7 @@ Python 3 + Qt5 (Recommended)
     pip3 install pyqt5 lxml # Install qt and lxml by pip
 
     make qt5py3
+    pip install opencv-python opencv-contrib-python
     python3 labelImg.py
     python3 labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
@@ -90,7 +93,7 @@ Virtualenv can avoid a lot of the QT / Python version issues
     brew install python3
     pip3 install pipenv
     pipenv --three # or pipenv install pyqt5 lxml
-    pipenv run pip install pyqt5 lxml
+    pipenv run pip install pyqt5 lxml opencv-python opencv-contrib-python
     pipenv run make qt5py3
     python3 labelImg.py
     [Optional] rm -rf build dist; python setup.py py2app -A;mv "dist/labelImg.app" /Applications
@@ -104,6 +107,8 @@ Windows
 Install `Python <https://www.python.org/downloads/windows/>`__,
 `PyQt5 <https://www.riverbankcomputing.com/software/pyqt/download5>`__
 and `install lxml <http://lxml.de/installation.html>`__.
+
+Install opencv-python opencv-contrib-python (for windows)
 
 Open cmd and go to the `labelImg <#labelimg>`__ directory
 
@@ -125,39 +130,13 @@ Open the Anaconda Prompt and go to the `labelImg <#labelimg>`__ directory
 .. code:: shell
 
     conda install pyqt=5
+    conda install opencv-python opencv-contrib-python
     pyrcc5 -o libs/resources.py resources.qrc
     python labelImg.py
     python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
-Get from PyPI but only python3.0 or above
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. code:: shell
-
-    pip3 install labelImg
-    labelImg
-    labelImg [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
-
-
-Use Docker
-~~~~~~~~~~~~~~~~~
-.. code:: shell
-
-    docker run -it \
-    --user $(id -u) \
-    -e DISPLAY=unix$DISPLAY \
-    --workdir=$(pwd) \
-    --volume="/home/$USER:/home/$USER" \
-    --volume="/etc/group:/etc/group:ro" \
-    --volume="/etc/passwd:/etc/passwd:ro" \
-    --volume="/etc/shadow:/etc/shadow:ro" \
-    --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
-    -v /tmp/.X11-unix:/tmp/.X11-unix \
-    tzutalin/py2qt4
-
-    make qt4py2;./labelImg.py
 
 You can pull the image which has all of the installed and required dependencies. `Watch a demo video <https://youtu.be/nw1GexJzbCI>`__
-
 
 Usage
 -----
@@ -198,6 +177,7 @@ Note:
 
 - When saving as YOLO format, "difficult" flag is discarded.
 
+.. _header-obj-trac:
 
 Object Tracking
 ~~~~~~~~~~~~~~~
@@ -214,7 +194,7 @@ Object Tracking
 
 Note:
 
-- Tracked bounding boxes for the "next image" will only be created if the dimensional of two images are same. ("current image with bounding box" & "next image")
+- Tracked bounding boxes for the "next image" will **only be created if the dimensional of two images are same.** ("current image with bounding box" & "next image")
 
 - Tracked bounding boxes for the "next image" will only be created if there are no previously saved bounding boxes for that "next image".
 
@@ -293,3 +273,4 @@ Citation: Tzutalin. LabelImg. Git code (2015). https://github.com/tzutalin/label
         :target: https://github.com/SanjyotZade/labelImg-TRK
 
 Author: `SanjyotZade <http://www.sanjyot.info/>`__
+
