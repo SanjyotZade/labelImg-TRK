@@ -125,7 +125,7 @@ Open the Anaconda Prompt and go to the `labelImg <#labelimg>`__ directory
 .. code:: shell
 
     conda install pyqt=5
-    ocnda install lxml
+    conda install lxml
     conda install opencv-python opencv-contrib-python
     pyrcc5 -o libs/resources.py resources.qrc
     python labelImg.py
