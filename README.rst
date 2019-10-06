@@ -5,7 +5,7 @@ LabelImg-TRK is a graphical image annotation tool.
 
 It is written in Python and uses Qt for its graphical interface.
 
-Tracking has been recently added to LabelImg-TRK to fasten the data annotation process. Consecutive images should have same dimensions.
+**Tracking has been recently added to LabelImg-TRK to fasten the data annotation process. Consecutive images should have same dimensions.**
 
 Annotations are saved as XML files in PASCAL VOC format, the format used
 by `ImageNet <http://www.image-net.org/>`__.  Besides, it also supports YOLO format
@@ -71,11 +71,6 @@ Python 3 + Qt5 (Recommended)
 
 .. code:: shell
 
-    brew install qt  # Install qt-5.x.x by Homebrew
-    brew install libxml2
-
-    or using pip
-
     pip3 install pyqt5 lxml # Install qt and lxml by pip
 
     make qt5py3
@@ -130,6 +125,7 @@ Open the Anaconda Prompt and go to the `labelImg <#labelimg>`__ directory
 .. code:: shell
 
     conda install pyqt=5
+    ocnda install lxml
     conda install opencv-python opencv-contrib-python
     pyrcc5 -o libs/resources.py resources.qrc
     python labelImg.py
@@ -268,6 +264,10 @@ This annotation tool was originally build by tzutalin. This is just an extension
 
 Citation: Tzutalin. LabelImg. Git code (2015). https://github.com/tzutalin/labelImg
 
+Support
+~~~~~~~
+Feel free to open an issue on or send along a pull request.
+If you like the work, show your appreciation by "FORK", "STAR", or "SHARE".
 
 .. image:: https://forthebadge.com/images/badges/built-with-love.svg
         :target: https://github.com/SanjyotZade/labelImg-TRK
