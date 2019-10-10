@@ -4,6 +4,7 @@ resources.py
 
 .idea*
 labelImg.egg-info*
+.DS_Store
 
 *.pyc
 .*.swp
