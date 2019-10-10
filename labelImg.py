@@ -9,7 +9,7 @@ import subprocess
 from functools import partial
 from collections import defaultdict
 
-trackerTypes = ['BOOSTING', 'MIL', 'KCF', 'TLD', 'MEDIANFLOW', 'GOTURN', 'MOSSE', 'CSRT']
+trackerTypes = ['BOOSTING', 'MIL', 'KCF', 'TLD', 'MEDIANFLOW', 'GOTURN', 'MOSSE', 'CSRT', 'SiamMask_DAVIS', 'SiamMask_VOT']
 
 try:
     from PyQt5.QtGui import *
@@ -44,7 +44,7 @@ from libs.yolo_io import YoloReader
 from libs.yolo_io import TXT_EXT
 from libs.ustr import ustr
 from libs.hashableQListWidgetItem import HashableQListWidgetItem
-
+from siam_mask_tracking import tracking
 __appname__ = 'labelImg'
 
 class WindowMixin(object):
@@ -132,9 +132,10 @@ class MainWindow(QMainWindow, WindowMixin):
         self.trackingComboBox.addItem("KCF")
         self.trackingComboBox.addItem("TLD")
         self.trackingComboBox.addItem("MEDIANFLOW")
-        # self.trackingComboBox.addItem("GOTURN")
         self.trackingComboBox.addItem("MOSSE")
         self.trackingComboBox.addItem("CSRT")
+        self.trackingComboBox.addItem("SiamMask_DAVIS")
+        self.trackingComboBox.addItem("SiamMask_VOT")
         self.trackingComboBoxQlabel = QLabel("Tracking algo")
 
         self.trackingCheckbox = QCheckBox("Tracking")
@@ -993,23 +994,45 @@ class MainWindow(QMainWindow, WindowMixin):
         trackerType = self.trackingComboBox.currentText()
 
         # Create a tracker based on tracker name
+        print (trackerType)
         if trackerType == trackerTypes[0]:
             tracker = cv2.TrackerBoosting_create()
+            return tracker, "cv2"
+
         elif trackerType == trackerTypes[1]:
             tracker = cv2.TrackerMIL_create()
+            return tracker, "cv2"
+
         elif trackerType == trackerTypes[2]:
             tracker = cv2.TrackerKCF_create()
+            return tracker, "cv2"
+
         elif trackerType == trackerTypes[3]:
             tracker = cv2.TrackerTLD_create()
+            return tracker, "cv2"
+
         elif trackerType == trackerTypes[4]:
             tracker = cv2.TrackerMedianFlow_create()
+            return tracker, "cv2"
+
         elif trackerType == trackerTypes[5]:
             tracker = cv2.TrackerGOTURN_create()
+            return tracker, "cv2"
+
         elif trackerType == trackerTypes[6]:
             tracker = cv2.TrackerMOSSE_create()
+            return tracker, "cv2"
+
         elif trackerType == trackerTypes[7]:
             tracker = cv2.TrackerCSRT_create()
-        return tracker
+            return tracker, "cv2"
+
+        elif trackerType == trackerTypes[8]:
+            return tracking("SiamMask_DAVIS"), "SIAM_MASK"
+
+        elif trackerType == trackerTypes[9]:
+            return tracking("SiamMask_VOT"), "SIAM_MASK"
+
 
     def tracking(self, new_file_path, old_file_path, old_shapes, format=FORMAT_PASCALVOC):
         old_image = cv2.imread(old_file_path)
@@ -1023,21 +1046,26 @@ class MainWindow(QMainWindow, WindowMixin):
                 h = int(points[2][1]) - int(points[0][1])
                 bbox = (int(points[0][0]), int(points[0][1]), w, h)
 
-                multiTracker = cv2.MultiTracker_create()
-                multiTracker.add(self.createTrackerByName(), old_image, bbox)
-                success, boxes = multiTracker.update(new_image)
+                tracker, methodology = self.createTrackerByName()
 
-                x1, y1, w, h = boxes[0]
+                if methodology == "cv2":
+                    multiTracker = cv2.MultiTracker_create()
+                    multiTracker.add(tracker, old_image, bbox)
+                    success, boxes = multiTracker.update(new_image)
 
-                point1=(int(x1), int(y1))
-                point2 = (int(x1), int(y1) + int(h))
-                point3 = (int(w) + int(x1), int(y1))
+                    x1, y1, w, h = boxes[0]
+
+                    point1=(int(x1), int(y1))
+                    point2 = (int(x1), int(y1) + int(h))
+                    point3 = (int(w) + int(x1), int(y1))
 
 
-                point4 = (
-                    int(x1) + int(w),
-                    int(y1) + int(h)
-                )
+                    point4 = (
+                        int(x1) + int(w),
+                        int(y1) + int(h)
+                    )
+                elif methodology == "SIAM_MASK":
+                    point1, point2, point3, point4 = tracker.siam_mask_inference(old_file_path, bbox)
 
                 old_shapes[value_num] = list(old_shapes[value_num])
                 old_shapes[value_num][1] = [point1, point2, point4, point3]
