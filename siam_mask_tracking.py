@@ -87,15 +87,30 @@ class tracking():
         x3, y3 = int(location[4]), int(location[5])
         x4, y4 = int(location[6]), int(location[7])
 
+
+        xmin = min([x1, x2, x3, x4])
+        ymin = min([y1, y2, y3, y4])
+        xmax = max([x1, x2, x3, x4])
+        ymax = max([y1, y2, y3, y4])
+
+        w = xmax - xmin
+        h = ymax - ymin
+
         # cv2.polylines(ims, [np.int0(location).reshape((-1, 1, 2))], True, (0, 255, 0), 3)
         # cv2.circle(ims, (x1, y1), 3, (0, 0, 255), -1)
         # cv2.circle(ims, (x2, y2), 3, (0, 0, 255), -1)
         # cv2.circle(ims, (x3, y3), 3, (0, 0, 255), -1)
         # cv2.circle(ims, (x4, y4), 3, (0, 0, 255), -1)
         #
+        # cv2.circle(ims, (xmin, ymin), 3, (0, 0, 255), -1)
+        # cv2.circle(ims, (xmin+w, ymin), 3, (0, 0, 255), -1)
+        # cv2.circle(ims, (xmin, ymin+h), 3, (0, 0, 255), -1)
+        # cv2.circle(ims, (xmax, ymax), 3, (0, 0, 255), -1)
+        #
         # cv2.imshow('SiamMask', ims)
         # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
 
-        return (x1, y1), (x2, y2), (x3, y3), (x4, y4 )
+        return (xmin, ymin), (xmin+w, ymin), (xmin, ymin+h), (xmax, ymax)
 
 
