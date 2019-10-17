@@ -38,7 +38,7 @@ Python 2 + Qt4
 .. code:: shell
 
     sudo apt-get install pyqt4-dev-tools
-    sudo pip3 install -r requirements-linux-python3.txt
+    sudo pip3 install -r requirements.txt
     make qt4py2
     python labelImg.py
     python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
@@ -48,7 +48,7 @@ Python 3 + Qt5 (Recommended)
 .. code:: shell
 
     sudo apt-get install pyqt5-dev-tools
-    sudo pip3 install -r requirements-linux-python3.txt
+    sudo pip3 install -r requirements.txt
     make qt5py3
     python3 labelImg.py
     python3 labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
