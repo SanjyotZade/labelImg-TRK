@@ -64,7 +64,7 @@ Python 3 + Qt5 (Recommended)
 
     pip3 install -r requirements.txt
     make qt5py3
-    bash initialize_siamMask.sh
+    bash initialize_siamMask.sh 
     python3 labelImg.py
     python3 labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
