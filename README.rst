@@ -59,6 +59,7 @@ macOS
 Python 3 + Qt5 (Recommended)
 
 .. code:: shell
+
     pip3 install -r requirements.txt
     make qt5py3
     python3 labelImg.py
