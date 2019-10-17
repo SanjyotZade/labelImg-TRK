@@ -38,7 +38,7 @@ Python 2 + Qt4
 .. code:: shell
 
     sudo apt-get install pyqt4-dev-tools
-    sudo pip3 install -r requirements/requirements-linux-python3.txt
+    sudo pip3 install -r requirements-linux-python3.txt
     make qt4py2
     python labelImg.py
     python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
@@ -48,28 +48,18 @@ Python 3 + Qt5 (Recommended)
 .. code:: shell
 
     sudo apt-get install pyqt5-dev-tools
-    sudo pip3 install -r requirements/requirements-linux-python3.txt
+    sudo pip3 install -r requirements-linux-python3.txt
     make qt5py3
     python3 labelImg.py
     python3 labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
 macOS
 ^^^^^
-Python 2 + Qt4
-
-.. code:: shell
-
-    brew install qt qt4
-    brew install libxml2
-    make qt4py2
-    pip install opencv-python opencv-contrib-python
-    python labelImg.py
-    python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
 Python 3 + Qt5 (Recommended)
 
 .. code:: shell
-    pip3 install -r requirements/requirements.txt
+    pip3 install -r requirements.txt
     make qt5py3
     python3 labelImg.py
     python3 labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
@@ -84,7 +74,7 @@ Virtualenv can avoid a lot of the QT / Python version issues
     brew install python3
     pip3 install pipenv
     pipenv --three # or pipenv install pyqt5 lxml
-    pipenv run pip install -r install requirements/requirements.txt
+    pipenv run pip install -r install requirements.txt
     pipenv run make qt5py3
     python3 labelImg.py
     [Optional] rm -rf build dist; python setup.py py2app -A;mv "dist/labelImg.app" /Applications
@@ -120,7 +110,7 @@ Open the Anaconda Prompt and go to the `labelImg <#labelimg>`__ directory
 
 .. code:: shell
 
-    conda install -r requirements/requirements.txt
+    conda install -r requirements.txt
     pyrcc5 -o libs/resources.py resources.qrc
     python labelImg.py
     python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
