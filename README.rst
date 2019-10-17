@@ -37,9 +37,10 @@ Python 2 + Qt4
 
 .. code:: shell
 
-    sudo apt-get install pyqt4-dev-tools
+    sudo apt-get install pyqt4-dev-tools gcc
     sudo pip3 install -r requirements.txt
     make qt4py2
+    bash initialize_siamMask.sh
     python labelImg.py
     python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
@@ -47,9 +48,10 @@ Python 3 + Qt5 (Recommended)
 
 .. code:: shell
 
-    sudo apt-get install pyqt5-dev-tools
+    sudo apt-get install pyqt5-dev-tools gcc
     sudo pip3 install -r requirements.txt
     make qt5py3
+    bash initialize_siamMask.sh
     python3 labelImg.py
     python3 labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
@@ -62,6 +64,7 @@ Python 3 + Qt5 (Recommended)
 
     pip3 install -r requirements.txt
     make qt5py3
+    bash initialize_siamMask.sh
     python3 labelImg.py
     python3 labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
@@ -77,6 +80,7 @@ Virtualenv can avoid a lot of the QT / Python version issues
     pipenv --three # or pipenv install pyqt5 lxml
     pipenv run pip install -r install requirements.txt
     pipenv run make qt5py3
+    bash initialize_siamMask.sh
     python3 labelImg.py
     [Optional] rm -rf build dist; python setup.py py2app -A;mv "dist/labelImg.app" /Applications
 
