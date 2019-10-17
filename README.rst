@@ -38,8 +38,7 @@ Python 2 + Qt4
 .. code:: shell
 
     sudo apt-get install pyqt4-dev-tools
-    sudo pip install lxml
-    sudo pip install opencv-python opencv-contrib-python
+    sudo pip3 install -r requirements/requirements-linux-python3.txt
     make qt4py2
     python labelImg.py
     python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
@@ -70,11 +69,8 @@ Python 2 + Qt4
 Python 3 + Qt5 (Recommended)
 
 .. code:: shell
-
-    pip3 install pyqt5 lxml # Install qt and lxml by pip
-
+    pip3 install -r requirements/requirements.txt
     make qt5py3
-    pip install opencv-python opencv-contrib-python
     python3 labelImg.py
     python3 labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
@@ -88,7 +84,7 @@ Virtualenv can avoid a lot of the QT / Python version issues
     brew install python3
     pip3 install pipenv
     pipenv --three # or pipenv install pyqt5 lxml
-    pipenv run pip install pyqt5 lxml opencv-python opencv-contrib-python
+    pipenv run pip install -r install requirements/requirements.txt
     pipenv run make qt5py3
     python3 labelImg.py
     [Optional] rm -rf build dist; python setup.py py2app -A;mv "dist/labelImg.app" /Applications
@@ -108,7 +104,7 @@ Install opencv-python opencv-contrib-python (for windows)
 Open cmd and go to the `labelImg <#labelimg>`__ directory
 
 .. code:: shell
-
+    ??
     pyrcc4 -o line/resources.py resources.qrc
     For pyqt5, pyrcc5 -o libs/resources.py resources qrc
     
@@ -124,9 +120,7 @@ Open the Anaconda Prompt and go to the `labelImg <#labelimg>`__ directory
 
 .. code:: shell
 
-    conda install pyqt=5
-    conda install lxml
-    conda install opencv-python opencv-contrib-python
+    conda install -r requirements/requirements.txt
     pyrcc5 -o libs/resources.py resources.qrc
     python labelImg.py
     python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
