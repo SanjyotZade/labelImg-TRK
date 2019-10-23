@@ -747,7 +747,17 @@ class MainWindow(QMainWindow, WindowMixin):
         # compute the area of both the prediction and ground-truth
         # rectangles
         boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
-        return interArea / boxAArea
+
+        boxBArea = (boxB[2] - boxB[0] + 1) * (boxB[3] - boxB[1] + 1)
+
+        # compute the intersection over union by taking the intersection
+        # area and dividing it by the sum of prediction + ground-truth
+        # areas - the interesection area
+        iou = interArea / float(boxAArea + boxBArea - interArea)
+
+        # return the intersection over union value
+        # return iou
+        return iou
 
     def remove_error_shape(self, shape):
         point_new = [int(shape.points[0].x()), int(shape.points[0].y()), int(shape.points[2].x()), int(shape.points[2].y())]
@@ -756,7 +766,8 @@ class MainWindow(QMainWindow, WindowMixin):
         for other_shape in self.shapesToItems.keys():
             point_old = [int(other_shape.points[0].x()), int(other_shape.points[0].y()), int(other_shape.points[2].x()), int(other_shape.points[2].y())]
             intersection = self.bb_intersection_over_union(point_new, point_old)
-            if intersection > 0.98:
+            if intersection > 0.80:
+                print(intersection)
                 keys_to_remove.append(other_shape)
         print ("Before DICT-{}".format(self.shapesToItems))
         for to_remove in keys_to_remove:
@@ -767,6 +778,7 @@ class MainWindow(QMainWindow, WindowMixin):
         print("Improved DICT-{}".format(self.shapesToItems))
         self.addLabel(shape)
         print("Final Dict-{}".format(self.shapesToItems))
+        
     # React to canvas signals.
     def shapeSelectionChanged(self, selected=False):
         if self._noSelectionSlot:
