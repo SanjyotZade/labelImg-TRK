@@ -741,6 +741,8 @@ class MainWindow(QMainWindow, WindowMixin):
         else:
             shape = self.canvas.selectedShape
             if shape:
+                print ("SHAPE_SELECTION_CHANGED  shape-{}".format(shape))
+                print("DICT-{}".format(self.shapesToItems))
                 self.shapesToItems[shape].setSelected(True)
             else:
                 self.labelList.clearSelection()
@@ -756,8 +758,11 @@ class MainWindow(QMainWindow, WindowMixin):
         item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
         item.setCheckState(Qt.Checked)
         item.setBackground(generateColorByText(shape.label))
+
+        print ("ADD_LABEL shape-{}".format(shape, item))
         self.itemsToShapes[item] = shape
         self.shapesToItems[shape] = item
+        print("DICT-{}".format(self.shapesToItems))
         self.labelList.addItem(item)
         for action in self.actions.onShapesPresent:
             action.setEnabled(True)
@@ -839,7 +844,7 @@ class MainWindow(QMainWindow, WindowMixin):
             else:
                 self.labelFile.save(annotationFilePath, shapes, self.filePath, self.imageData,
                                     self.lineColor.getRgb(), self.fillColor.getRgb())
-            print('Image:{0} -> Annotation:{1}\n'.format(self.filePath, annotationFilePath))
+            print('Image:{0} -> Annotation:{1}'.format(self.filePath, annotationFilePath))
             return True
         except LabelFileError as e:
             self.errorMessage(u'Error saving label data', u'<b>%s</b>' % e)
@@ -994,6 +999,7 @@ class MainWindow(QMainWindow, WindowMixin):
         trackerType = self.trackingComboBox.currentText()
 
         # Create a tracker based on tracker name
+        print ()
         print (trackerType)
         if trackerType == trackerTypes[0]:
             tracker = cv2.TrackerBoosting_create()
@@ -1032,7 +1038,6 @@ class MainWindow(QMainWindow, WindowMixin):
 
         elif trackerType == trackerTypes[9]:
             return tracking("SiamMask_VOT"), "SIAM_MASK"
-
 
     def tracking(self, new_file_path, old_file_path, old_shapes, format=FORMAT_PASCALVOC):
         old_image = cv2.imread(old_file_path)
@@ -1079,7 +1084,6 @@ class MainWindow(QMainWindow, WindowMixin):
                 # cv2.imshow("new", new_image)
 
             self.labelFile = LabelFile()
-
             if old_shapes:
                 self.set_format(format)
                 self.loadLabels(old_shapes, draw=False)
@@ -1146,6 +1150,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 tracked = True
                 if new_shapes:
                     self.loadPascalXMLByFilename(xmlPath, track_color=True)
+
         elif os.path.isfile(old_txtPath):
             # tracking in YOLO format
             tYoloParseReader = YoloReader(old_txtPath, QImage.fromData(read(ustr(old_file_path), None)))
@@ -1213,6 +1218,8 @@ class MainWindow(QMainWindow, WindowMixin):
             self.image = image
             self.filePath = unicodeFilePath
             self.canvas.loadPixmap(QPixmap.fromImage(image))
+
+
             if self.labelFile:
                 self.loadLabels(self.labelFile.shapes)
             self.setClean()
@@ -1229,12 +1236,11 @@ class MainWindow(QMainWindow, WindowMixin):
                 xmlPath = os.path.join(self.defaultSaveDir, basename + XML_EXT)
                 txtPath = os.path.join(self.defaultSaveDir, basename + TXT_EXT)
 
-                tracked = self.loadAnnotations(xmlPath, txtPath, old_file_path)
-
             else:
                 xmlPath = os.path.splitext(filePath)[0] + XML_EXT
                 txtPath = os.path.splitext(filePath)[0] + TXT_EXT
-                tracked = self.loadAnnotations(xmlPath, txtPath, old_file_path)
+
+            tracked = self.loadAnnotations(xmlPath, txtPath, old_file_path)
 
             if tracked and old_file_path:
                 self.setWindowTitle(self.trackingComboBox.currentText()+' tracking ' + old_file_path.split("/")[-1]+" >> "+filePath.split("/")[-1])
