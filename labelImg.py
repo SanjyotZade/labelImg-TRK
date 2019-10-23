@@ -734,6 +734,33 @@ class MainWindow(QMainWindow, WindowMixin):
         except:
             pass
 
+    def bb_intersection_over_union(self, boxA, boxB):
+        # determine the (x, y)-coordinates of the intersection rectangle
+        xA = max(boxA[0], boxB[0])
+        yA = max(boxA[1], boxB[1])
+        xB = min(boxA[2], boxB[2])
+        yB = min(boxA[3], boxB[3])
+
+        # compute the area of intersection rectangle
+        interArea = max(0, xB - xA + 1) * max(0, yB - yA + 1)
+
+        # compute the area of both the prediction and ground-truth
+        # rectangles
+        boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
+        return interArea / boxAArea
+
+    def remove_error_shape(self, shape):
+        point_new = [int(shape.points[0].x()), int(shape.points[0].y()), int(shape.points[2].x()), int(shape.points[2].y())]
+
+        keys_to_remove = []
+        for other_shape in self.shapesToItems.keys():
+            point_old = [int(other_shape.points[0].x()), int(other_shape.points[0].y()), int(other_shape.points[2].x()), int(other_shape.points[2].y())]
+            intersection = self.bb_intersection_over_union(point_new, point_old)
+            if intersection > 0.98:
+                keys_to_remove.append(other_shape)
+        for to_remove in keys_to_remove:
+            self.remLabel[to_remove]
+
     # React to canvas signals.
     def shapeSelectionChanged(self, selected=False):
         if self._noSelectionSlot:
@@ -741,13 +768,13 @@ class MainWindow(QMainWindow, WindowMixin):
         else:
             shape = self.canvas.selectedShape
             if shape:
-                print ("SHAPE_SELECTION_CHANGED  shape-{}".format(shape))
-                print("DICT-{}".format(self.shapesToItems))
+                # print ("SHAPE_SELECTION_CHANGED  shape-{}".format(shape))
+                # print("DICT-{}".format(self.shapesToItems))
 
                 if shape not in self.shapesToItems.keys():
                     print("Error case")
                     self.addLabel(shape)
-
+                    self.remove_error_shape(shape)
                 self.shapesToItems[shape].setSelected(True)
             else:
                 self.labelList.clearSelection()
@@ -764,10 +791,10 @@ class MainWindow(QMainWindow, WindowMixin):
         item.setCheckState(Qt.Checked)
         item.setBackground(generateColorByText(shape.label))
 
-        print ("ADD_LABEL shape-{}".format(shape, item))
+        # print ("ADD_LABEL shape-{}".format(shape, item))
         self.itemsToShapes[item] = shape
         self.shapesToItems[shape] = item
-        print("DICT-{}".format(self.shapesToItems))
+        # print("DICT-{}".format(self.shapesToItems))
         self.labelList.addItem(item)
         for action in self.actions.onShapesPresent:
             action.setEnabled(True)
