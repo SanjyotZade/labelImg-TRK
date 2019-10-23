@@ -744,9 +744,9 @@ class MainWindow(QMainWindow, WindowMixin):
                 print ("SHAPE_SELECTION_CHANGED  shape-{}".format(shape))
                 print("DICT-{}".format(self.shapesToItems))
 
-                if shape not in self.shapesToItems.keys:
+                if shape not in self.shapesToItems.keys():
                     print("Error case")
-                    
+
                 self.shapesToItems[shape].setSelected(True)
             else:
                 self.labelList.clearSelection()
