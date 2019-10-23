@@ -759,8 +759,11 @@ class MainWindow(QMainWindow, WindowMixin):
             if intersection > 0.98:
                 keys_to_remove.append(other_shape)
         for to_remove in keys_to_remove:
-            self.remLabel(to_remove)
+            item_ = self.shapesToItems[to_remove]
+            del self.shapesToItems[to_remove]
+            del self.itemsToShapes[item_]
         print("Improved DICT-{}".format(self.shapesToItems))
+
     # React to canvas signals.
     def shapeSelectionChanged(self, selected=False):
         if self._noSelectionSlot:
@@ -768,8 +771,6 @@ class MainWindow(QMainWindow, WindowMixin):
         else:
             shape = self.canvas.selectedShape
             if shape:
-
-
                 if shape not in self.shapesToItems.keys():
                     print("Error case")
                     print("SHAPE_SELECTION_CHANGED  shape-{}".format(shape))
