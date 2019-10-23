@@ -760,7 +760,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 keys_to_remove.append(other_shape)
         for to_remove in keys_to_remove:
             self.remLabel(to_remove)
-
+        print("Improved DICT-{}".format(self.shapesToItems))
     # React to canvas signals.
     def shapeSelectionChanged(self, selected=False):
         if self._noSelectionSlot:
@@ -768,11 +768,12 @@ class MainWindow(QMainWindow, WindowMixin):
         else:
             shape = self.canvas.selectedShape
             if shape:
-                # print ("SHAPE_SELECTION_CHANGED  shape-{}".format(shape))
-                # print("DICT-{}".format(self.shapesToItems))
+
 
                 if shape not in self.shapesToItems.keys():
                     print("Error case")
+                    print("SHAPE_SELECTION_CHANGED  shape-{}".format(shape))
+                    print("DICT-{}".format(self.shapesToItems))
                     self.addLabel(shape)
                     self.remove_error_shape(shape)
                 self.shapesToItems[shape].setSelected(True)
