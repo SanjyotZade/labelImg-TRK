@@ -759,7 +759,7 @@ class MainWindow(QMainWindow, WindowMixin):
             if intersection > 0.98:
                 keys_to_remove.append(other_shape)
         for to_remove in keys_to_remove:
-            self.remLabel[to_remove]
+            self.remLabel(to_remove)
 
     # React to canvas signals.
     def shapeSelectionChanged(self, selected=False):
