@@ -778,7 +778,7 @@ class MainWindow(QMainWindow, WindowMixin):
         print("Improved DICT-{}".format(self.shapesToItems))
         self.addLabel(shape)
         print("Final Dict-{}".format(self.shapesToItems))
-        
+
     # React to canvas signals.
     def shapeSelectionChanged(self, selected=False):
         if self._noSelectionSlot:
@@ -801,19 +801,20 @@ class MainWindow(QMainWindow, WindowMixin):
         self.actions.shapeFillColor.setEnabled(selected)
 
     def addLabel(self, shape):
-        shape.paintLabel = self.displayLabelOption.isChecked()
-        item = HashableQListWidgetItem(shape.label)
-        item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
-        item.setCheckState(Qt.Checked)
-        item.setBackground(generateColorByText(shape.label))
+        if shape is not None:
+            shape.paintLabel = self.displayLabelOption.isChecked()
+            item = HashableQListWidgetItem(shape.label)
+            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+            item.setCheckState(Qt.Checked)
+            item.setBackground(generateColorByText(shape.label))
 
-        # print ("ADD_LABEL shape-{}".format(shape, item))
-        self.itemsToShapes[item] = shape
-        self.shapesToItems[shape] = item
-        # print("DICT-{}".format(self.shapesToItems))
-        self.labelList.addItem(item)
-        for action in self.actions.onShapesPresent:
-            action.setEnabled(True)
+            # print ("ADD_LABEL shape-{}".format(shape, item))
+            self.itemsToShapes[item] = shape
+            self.shapesToItems[shape] = item
+            # print("DICT-{}".format(self.shapesToItems))
+            self.labelList.addItem(item)
+            for action in self.actions.onShapesPresent:
+                action.setEnabled(True)
 
     def remLabel(self, shape):
         if shape is None:
