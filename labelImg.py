@@ -760,9 +760,10 @@ class MainWindow(QMainWindow, WindowMixin):
                 keys_to_remove.append(other_shape)
         print ("Before DICT-{}".format(self.shapesToItems))
         for to_remove in keys_to_remove:
-            item_ = self.shapesToItems[to_remove]
-            del self.shapesToItems[to_remove]
-            del self.itemsToShapes[item_]
+            self.remLabel(to_remove)
+            # item_ = self.shapesToItems[to_remove]
+            # del self.shapesToItems[to_remove]
+            # del self.itemsToShapes[item_]
         print("Improved DICT-{}".format(self.shapesToItems))
         self.addLabel(shape)
         print("Final Dict-{}".format(self.shapesToItems))
