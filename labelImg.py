@@ -746,6 +746,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
                 if shape not in self.shapesToItems.keys():
                     print("Error case")
+                    self.addLabel(shape)
 
                 self.shapesToItems[shape].setSelected(True)
             else:
